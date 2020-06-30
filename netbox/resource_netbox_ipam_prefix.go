@@ -151,7 +151,7 @@ func resourceNetboxIpamPrefixRead(d *schema.ResourceData,
 	log.Printf("[DEBUG] Start resourceNetboxIpamPrefixCreate func")
 
 	resourceID := d.Id()
-	log.Printf("[DEBUG] Get resource id (%v) from terraform state", resourceID)
+	log.Printf("[DEBUG] Get resource (id=%v) from terraform state", resourceID)
 
 	params := ipam.NewIpamPrefixesListParams().WithID(&resourceID)
 	resources, err := client.Ipam.IpamPrefixesList(params, nil)
@@ -161,9 +161,11 @@ func resourceNetboxIpamPrefixRead(d *schema.ResourceData,
 
 	log.Printf("[DEBUG] Fetch each resource to see if id is found")
 	for _, resource := range resources.Payload.Results {
-		log.Printf("[DEBUG] Check resource with ID: %v",
+		log.Printf("[DEBUG] Check resource with id=%v",
 			strconv.FormatInt(resource.ID, 10))
 		if strconv.FormatInt(resource.ID, 10) == d.Id() {
+			log.Printf("[DEBUG] Resource found (id=%v)", d.Id())
+
 			if err = d.Set("description", resource.Description); err != nil {
 				return err
 			}
