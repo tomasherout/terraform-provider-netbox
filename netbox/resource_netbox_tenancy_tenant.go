@@ -141,7 +141,7 @@ func resourceNetboxTenancyTenantRead(d *schema.ResourceData,
 		}
 	}
 
-	d.SetId("")
+	//d.SetId("")
 	return nil
 }
 

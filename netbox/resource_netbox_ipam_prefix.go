@@ -244,7 +244,7 @@ func resourceNetboxIpamPrefixRead(d *schema.ResourceData,
 		}
 	}
 
-	d.SetId("")
+	//d.SetId("")
 
 	log.Printf("[DEBUG] End resourceNetboxIpamPrefixCreate func")
 
