@@ -1,6 +1,7 @@
 package netbox
 
 import (
+	"log"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -77,6 +78,8 @@ func resourceNetboxIpamPrefixCreate(d *schema.ResourceData,
 	m interface{}) error {
 	client := m.(*netboxclient.NetBox)
 
+	log.Printf("[DEBUG] Start resourceNetboxIpamPrefixCreate func")
+
 	description := d.Get("description").(string)
 	isPool := d.Get("is_pool").(bool)
 	prefix := d.Get("prefix").(string)
@@ -87,6 +90,17 @@ func resourceNetboxIpamPrefixCreate(d *schema.ResourceData,
 	tenantID := int64(d.Get("tenant_id").(int))
 	vlanID := int64(d.Get("vlan_id").(int))
 	vrfID := int64(d.Get("vrf_id").(int))
+
+	log.Printf("[DEBUG] Get description (%s) from terraform code", description)
+	log.Printf("[DEBUG] Get isPool (%v) from terraform code", isPool)
+	log.Printf("[DEBUG] Get prefix (%s) from terraform code", prefix)
+	log.Printf("[DEBUG] Get roleID (%v) from terraform code", roleID)
+	log.Printf("[DEBUG] Get siteID (%v) from terraform code", siteID)
+	log.Printf("[DEBUG] Get status (%s) from terraform code", status)
+	log.Printf("[DEBUG] Get tags (%s) from terraform code", tags)
+	log.Printf("[DEBUG] Get tenantID (%v) from terraform code", tenantID)
+	log.Printf("[DEBUG] Get vlanID (%v) from terraform code", vlanID)
+	log.Printf("[DEBUG] Get vrfID (%v) from terraform code", vrfID)
 
 	newResource := &models.WritablePrefix{
 		Description: description,
@@ -125,6 +139,8 @@ func resourceNetboxIpamPrefixCreate(d *schema.ResourceData,
 
 	d.SetId(strconv.FormatInt(resourceCreated.Payload.ID, 10))
 
+	log.Printf("[DEBUG] End resourceNetboxIpamPrefixCreate func")
+
 	return resourceNetboxIpamPrefixRead(d, m)
 }
 
@@ -132,14 +148,21 @@ func resourceNetboxIpamPrefixRead(d *schema.ResourceData,
 	m interface{}) error {
 	client := m.(*netboxclient.NetBox)
 
+	log.Printf("[DEBUG] Start resourceNetboxIpamPrefixCreate func")
+
 	resourceID := d.Id()
+	log.Printf("[DEBUG] Get resource id (%v) from terraform state", resourceID)
+
 	params := ipam.NewIpamPrefixesListParams().WithID(&resourceID)
 	resources, err := client.Ipam.IpamPrefixesList(params, nil)
 	if err != nil {
 		return err
 	}
 
+	log.Printf("[DEBUG] Fetch each resource to see if id is found")
 	for _, resource := range resources.Payload.Results {
+		log.Printf("[DEBUG] Check resource with ID: %v",
+			strconv.FormatInt(resource.ID, 10))
 		if strconv.FormatInt(resource.ID, 10) == d.Id() {
 			if err = d.Set("description", resource.Description); err != nil {
 				return err
@@ -222,6 +245,9 @@ func resourceNetboxIpamPrefixRead(d *schema.ResourceData,
 	}
 
 	d.SetId("")
+
+	log.Printf("[DEBUG] End resourceNetboxIpamPrefixCreate func")
+
 	return nil
 }
 
