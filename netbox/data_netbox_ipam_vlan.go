@@ -27,7 +27,7 @@ func dataNetboxIpamVlan() *schema.Resource {
 }
 
 func dataNetboxIpamVlanRead(d *schema.ResourceData, m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	id := int64(d.Get("vlan_id").(int))
 	idStr := strconv.FormatInt(id, 10)

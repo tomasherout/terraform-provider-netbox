@@ -39,7 +39,7 @@ func resourceNetboxTenancyTenantGroup() *schema.Resource {
 
 func resourceNetboxTenancyTenantGroupCreate(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	groupName := d.Get("name").(string)
 	groupSlug := d.Get("slug").(string)
@@ -63,7 +63,7 @@ func resourceNetboxTenancyTenantGroupCreate(d *schema.ResourceData,
 
 func resourceNetboxTenancyTenantGroupRead(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	resourceID := d.Id()
 	params := tenancy.NewTenancyTenantGroupsListParams().WithID(&resourceID)
@@ -93,7 +93,7 @@ func resourceNetboxTenancyTenantGroupRead(d *schema.ResourceData,
 
 func resourceNetboxTenancyTenantGroupUpdate(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 	params := &models.WritableTenantGroup{}
 
 	if d.HasChange("name") {
@@ -126,7 +126,7 @@ func resourceNetboxTenancyTenantGroupUpdate(d *schema.ResourceData,
 
 func resourceNetboxTenancyTenantGroupDelete(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	resourceExists, err := resourceNetboxTenancyTenantGroupExists(d, m)
 	if err != nil {
@@ -153,7 +153,7 @@ func resourceNetboxTenancyTenantGroupDelete(d *schema.ResourceData,
 func resourceNetboxTenancyTenantGroupExists(d *schema.ResourceData,
 	m interface{}) (b bool,
 	e error) {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 	resourceExist := false
 
 	resourceID := d.Id()

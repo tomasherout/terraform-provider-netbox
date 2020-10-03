@@ -89,7 +89,7 @@ func resourceNetboxIpamIPAddresses() *schema.Resource {
 
 func resourceNetboxIpamIPAddressesCreate(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	address := d.Get("address").(string)
 	description := d.Get("description").(string)
@@ -146,7 +146,7 @@ func resourceNetboxIpamIPAddressesCreate(d *schema.ResourceData,
 
 func resourceNetboxIpamIPAddressesRead(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	resourceID := d.Id()
 	params := ipam.NewIpamIPAddressesListParams().WithID(&resourceID)
@@ -254,7 +254,7 @@ func resourceNetboxIpamIPAddressesRead(d *schema.ResourceData,
 
 func resourceNetboxIpamIPAddressesUpdate(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 	params := &models.WritableIPAddress{}
 
 	address := d.Get("address").(string)
@@ -340,7 +340,7 @@ func resourceNetboxIpamIPAddressesUpdate(d *schema.ResourceData,
 
 func resourceNetboxIpamIPAddressesDelete(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	resourceExists, err := resourceNetboxIpamIPAddressesExists(d, m)
 	if err != nil {
@@ -366,7 +366,7 @@ func resourceNetboxIpamIPAddressesDelete(d *schema.ResourceData,
 
 func resourceNetboxIpamIPAddressesExists(d *schema.ResourceData,
 	m interface{}) (b bool, e error) {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 	resourceExist := false
 
 	resourceID := d.Id()

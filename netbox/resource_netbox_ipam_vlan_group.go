@@ -43,7 +43,7 @@ func resourceNetboxIpamVlanGroup() *schema.Resource {
 
 func resourceNetboxIpamVlanGroupCreate(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	groupName := d.Get("name").(string)
 	groupSiteID := int64(d.Get("site_id").(int))
@@ -71,7 +71,7 @@ func resourceNetboxIpamVlanGroupCreate(d *schema.ResourceData,
 
 func resourceNetboxIpamVlanGroupRead(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	resourceID := d.Id()
 	params := ipam.NewIpamVlanGroupsListParams().WithID(&resourceID)
@@ -110,7 +110,7 @@ func resourceNetboxIpamVlanGroupRead(d *schema.ResourceData,
 
 func resourceNetboxIpamVlanGroupUpdate(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 	params := &models.WritableVLANGroup{}
 
 	name := d.Get("name").(string)
@@ -147,7 +147,7 @@ func resourceNetboxIpamVlanGroupUpdate(d *schema.ResourceData,
 }
 
 func resourceNetboxIpamVlanGroupDelete(d *schema.ResourceData, m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	resourceExists, err := resourceNetboxIpamVlanGroupExists(d, m)
 	if err != nil {
@@ -173,7 +173,7 @@ func resourceNetboxIpamVlanGroupDelete(d *schema.ResourceData, m interface{}) er
 
 func resourceNetboxIpamVlanGroupExists(d *schema.ResourceData, m interface{}) (b bool,
 	e error) {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 	resourceExist := false
 
 	resourceID := d.Id()

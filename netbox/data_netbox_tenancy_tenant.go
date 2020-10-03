@@ -28,7 +28,7 @@ func dataNetboxTenancyTenant() *schema.Resource {
 }
 
 func dataNetboxTenancyTenantRead(d *schema.ResourceData, m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	slug := d.Get("slug").(string)
 

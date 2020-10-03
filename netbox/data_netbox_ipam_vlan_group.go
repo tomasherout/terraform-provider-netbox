@@ -32,7 +32,7 @@ func dataNetboxIpamVlanGroup() *schema.Resource {
 }
 
 func dataNetboxIpamVlanGroupRead(d *schema.ResourceData, m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	slug := d.Get("slug").(string)
 	siteID := d.Get("site_id").(int)

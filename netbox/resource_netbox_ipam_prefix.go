@@ -75,7 +75,7 @@ func resourceNetboxIpamPrefix() *schema.Resource {
 
 func resourceNetboxIpamPrefixCreate(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	description := d.Get("description").(string)
 	isPool := d.Get("is_pool").(bool)
@@ -130,7 +130,7 @@ func resourceNetboxIpamPrefixCreate(d *schema.ResourceData,
 
 func resourceNetboxIpamPrefixRead(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	resourceID := d.Id()
 	params := ipam.NewIpamPrefixesListParams().WithID(&resourceID)
@@ -227,7 +227,7 @@ func resourceNetboxIpamPrefixRead(d *schema.ResourceData,
 
 func resourceNetboxIpamPrefixUpdate(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 	params := &models.WritablePrefix{}
 
 	if d.HasChange("description") {
@@ -301,7 +301,7 @@ func resourceNetboxIpamPrefixUpdate(d *schema.ResourceData,
 
 func resourceNetboxIpamPrefixDelete(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	resourceExists, err := resourceNetboxIpamPrefixExists(d, m)
 	if err != nil {
@@ -327,7 +327,7 @@ func resourceNetboxIpamPrefixDelete(d *schema.ResourceData,
 
 func resourceNetboxIpamPrefixExists(d *schema.ResourceData,
 	m interface{}) (b bool, e error) {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 	resourceExist := false
 
 	resourceID := d.Id()

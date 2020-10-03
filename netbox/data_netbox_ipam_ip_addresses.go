@@ -29,7 +29,7 @@ func dataNetboxIpamIPAddresses() *schema.Resource {
 
 func dataNetboxIpamIPAddressesRead(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	address := d.Get("address").(string)
 
