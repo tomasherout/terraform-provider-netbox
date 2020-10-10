@@ -94,12 +94,12 @@ func resourceNetboxIpamIPAddressesCreate(d *schema.ResourceData,
 	address := d.Get("address").(string)
 	description := d.Get("description").(string)
 	dnsName := d.Get("dns_name").(string)
-	interfaceID := int64(d.Get("interface_id").(int))
+	// interfaceID := int64(d.Get("interface_id").(int))
 	natInsideID := int64(d.Get("nat_inside_id").(int))
 	natOutsideID := int64(d.Get("nat_outside_id").(int))
 	role := d.Get("role").(string)
 	status := d.Get("status").(string)
-	tags := d.Get("tags").(*schema.Set).List()
+	// tags := d.Get("tags").(*schema.Set).List()
 	tenantID := int64(d.Get("tenant_id").(int))
 	vrfID := int64(d.Get("vrf_id").(int))
 
@@ -109,12 +109,12 @@ func resourceNetboxIpamIPAddressesCreate(d *schema.ResourceData,
 		DNSName:     dnsName,
 		Role:        role,
 		Status:      status,
-		Tags:        expandToStringSlice(tags),
+		// Tags:        expandToStringSlice(tags),
 	}
 
-	if interfaceID != 0 {
-		newResource.Interface = &interfaceID
-	}
+	// if interfaceID != 0 {
+	// newResource.Interface = &interfaceID
+	// }
 
 	if natInsideID != 0 {
 		newResource.NatInside = &natInsideID
@@ -169,15 +169,17 @@ func resourceNetboxIpamIPAddressesRead(d *schema.ResourceData,
 				return err
 			}
 
-			if resource.Interface == nil {
-				if err = d.Set("vrf_id", nil); err != nil {
-					return err
-				}
-			} else {
-				if err = d.Set("interface_id", resource.Interface.ID); err != nil {
-					return err
-				}
-			}
+			/*
+			 * if resource.Interface == nil {
+			 *   if err = d.Set("vrf_id", nil); err != nil {
+			 *     return err
+			 *   }
+			 * } else {
+			 *   if err = d.Set("interface_id", resource.Interface.ID); err != nil {
+			 *     return err
+			 *   }
+			 * }
+			 */
 
 			if resource.NatInside == nil {
 				if err = d.Set("nat_inside_id", nil); err != nil {
@@ -272,12 +274,14 @@ func resourceNetboxIpamIPAddressesUpdate(d *schema.ResourceData,
 		params.DNSName = d.Get("dns_name").(string)
 	}
 
-	if d.HasChange("interface_id") {
-		interfaceID := int64(d.Get("interface_id").(int))
-		if interfaceID != 0 {
-			params.Interface = &interfaceID
-		}
-	}
+	/*
+	 * if d.HasChange("interface_id") {
+	 *   interfaceID := int64(d.Get("interface_id").(int))
+	 *   if interfaceID != 0 {
+	 *     params.Interface = &interfaceID
+	 *   }
+	 * }
+	 */
 
 	if d.HasChange("nat_inside_id") {
 		natInsideID := int64(d.Get("nat_inside_id").(int))
@@ -303,8 +307,8 @@ func resourceNetboxIpamIPAddressesUpdate(d *schema.ResourceData,
 		params.Status = status
 	}
 
-	tags := d.Get("tags").(*schema.Set).List()
-	params.Tags = expandToStringSlice(tags)
+	// tags := d.Get("tags").(*schema.Set).List()
+	// params.Tags = expandToStringSlice(tags)
 
 	if d.HasChange("tenant_id") {
 		tenantID := int64(d.Get("tenant_id").(int))

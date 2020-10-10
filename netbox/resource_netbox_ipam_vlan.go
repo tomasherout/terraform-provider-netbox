@@ -78,7 +78,7 @@ func resourceNetboxIpamVlanCreate(d *schema.ResourceData,
 	roleID := int64(d.Get("role_id").(int))
 	siteID := int64(d.Get("site_id").(int))
 	status := d.Get("status").(string)
-	tags := d.Get("tags").(*schema.Set).List()
+	// tags := d.Get("tags").(*schema.Set).List()
 	tenantID := int64(d.Get("tenant_id").(int))
 	vid := int64(d.Get("vlan_id").(int))
 
@@ -86,8 +86,8 @@ func resourceNetboxIpamVlanCreate(d *schema.ResourceData,
 		Description: description,
 		Name:        &name,
 		Status:      status,
-		Tags:        expandToStringSlice(tags),
-		Vid:         &vid,
+		// Tags:        expandToStringSlice(tags),
+		Vid: &vid,
 	}
 
 	if groupID != 0 {
@@ -244,8 +244,8 @@ func resourceNetboxIpamVlanUpdate(d *schema.ResourceData,
 		params.Status = d.Get("status").(string)
 	}
 
-	tags := d.Get("tags").(*schema.Set).List()
-	params.Tags = expandToStringSlice(tags)
+	// tags := d.Get("tags").(*schema.Set).List()
+	// params.Tags = expandToStringSlice(tags)
 
 	if d.HasChange("tenant_id") {
 		tenantID := int64(d.Get("tenant_id").(int))

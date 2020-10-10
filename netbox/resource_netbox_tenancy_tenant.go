@@ -68,14 +68,14 @@ func resourceNetboxTenancyTenantCreate(d *schema.ResourceData,
 	groupID := int64(d.Get("tenant_group_id").(int))
 	name := d.Get("name").(string)
 	slug := d.Get("slug").(string)
-	tags := d.Get("tags").(*schema.Set).List()
+	// tags := d.Get("tags").(*schema.Set).List()
 
 	newResource := &models.WritableTenant{
 		Comments:    comments,
 		Description: description,
 		Name:        &name,
 		Slug:        &slug,
-		Tags:        expandToStringSlice(tags),
+		// Tags:        expandToStringSlice(tags),
 	}
 
 	if groupID != 0 {
@@ -171,8 +171,8 @@ func resourceNetboxTenancyTenantUpdate(d *schema.ResourceData,
 	slug := d.Get("slug").(string)
 	params.Slug = &slug
 
-	tags := d.Get("tags").(*schema.Set).List()
-	params.Tags = expandToStringSlice(tags)
+	// tags := d.Get("tags").(*schema.Set).List()
+	// params.Tags = expandToStringSlice(tags)
 
 	resource := tenancy.NewTenancyTenantsPartialUpdateParams().WithData(params)
 
