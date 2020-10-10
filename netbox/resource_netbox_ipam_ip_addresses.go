@@ -45,6 +45,13 @@ func resourceNetboxIpamIPAddresses() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
+			"interface_type": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "",
+				ValidateFunc: validation.StringInSlice([]string{
+					"virtualization.vminterface", "dcim.interface"}, false),
+			},
 			"nat_inside_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
@@ -94,7 +101,8 @@ func resourceNetboxIpamIPAddressesCreate(d *schema.ResourceData,
 	address := d.Get("address").(string)
 	description := d.Get("description").(string)
 	dnsName := d.Get("dns_name").(string)
-	// interfaceID := int64(d.Get("interface_id").(int))
+	interfaceID := int64(d.Get("interface_id").(int))
+	interfaceType := d.Get("interface_type").(string)
 	natInsideID := int64(d.Get("nat_inside_id").(int))
 	natOutsideID := int64(d.Get("nat_outside_id").(int))
 	role := d.Get("role").(string)
@@ -112,9 +120,10 @@ func resourceNetboxIpamIPAddressesCreate(d *schema.ResourceData,
 		// Tags:        expandToStringSlice(tags),
 	}
 
-	// if interfaceID != 0 {
-	// newResource.Interface = &interfaceID
-	// }
+	if interfaceID != 0 {
+		newResource.AssignedObjectID = &interfaceID
+		newResource.AssignedObjectType = interfaceType
+	}
 
 	if natInsideID != 0 {
 		newResource.NatInside = &natInsideID
