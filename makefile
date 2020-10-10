@@ -24,10 +24,10 @@ build-all: clean
 	@for file in *.tar.gz; do echo "$$(sha256sum $${file})" >> sha256sums.txt; done
 
 localinstall:
-	@echo "==> Creating folder terraform.d/plugins/linux_amd64"
-	@mkdir -p ~/.terraform.d/plugins/linux_amd64
+	@echo "==> Creating folder ~/.terraform.d/plugins/registry.terraform.io/smutel/netbox/0.0.1/linux_amd64"
+	@mkdir -p ~/.terraform.d/plugins/registry.terraform.io/smutel/netbox/0.0.1/linux_amd64
 	@echo "==> Installing provider in this folder"
-	@cp terraform-provider-netbox ~/.terraform.d/plugins/linux_amd64
+	@cp terraform-provider-netbox ~/.terraform.d/plugins/registry.terraform.io/smutel/netbox/0.0.1/linux_amd64/terraform-provider-netbox_v0.0.1
 
 check:
 	@echo "==> Checking terraform-provider-netbox"
