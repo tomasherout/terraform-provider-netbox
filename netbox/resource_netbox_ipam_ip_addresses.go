@@ -107,9 +107,13 @@ func resourceNetboxIpamIPAddressesCreate(d *schema.ResourceData,
 	natOutsideID := int64(d.Get("nat_outside_id").(int))
 	role := d.Get("role").(string)
 	status := d.Get("status").(string)
-	// tags := d.Get("tags").(*schema.Set).List()
+	//tags := d.Get("tags").(*schema.Set).List()
 	tenantID := int64(d.Get("tenant_id").(int))
 	vrfID := int64(d.Get("vrf_id").(int))
+
+	tag_name := "test"
+	tag_slug := "test"
+	tags := []*models.NestedTag{{Name: &tag_name, Slug: &tag_slug}}
 
 	newResource := &models.WritableIPAddress{
 		Address:     &address,
@@ -117,7 +121,7 @@ func resourceNetboxIpamIPAddressesCreate(d *schema.ResourceData,
 		DNSName:     dnsName,
 		Role:        role,
 		Status:      status,
-		// Tags:        expandToStringSlice(tags),
+		Tags:        tags,
 	}
 
 	if interfaceID != 0 {
@@ -230,9 +234,9 @@ func resourceNetboxIpamIPAddressesRead(d *schema.ResourceData,
 				}
 			}
 
-			if err = d.Set("tags", resource.Tags); err != nil {
-				return err
-			}
+			// if err = d.Set("tags", resource.Tags); err != nil {
+			// return err
+			// }
 
 			if resource.Tenant == nil {
 				if err = d.Set("tenant_id", nil); err != nil {
