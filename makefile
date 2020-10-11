@@ -19,8 +19,9 @@ build:
 	@go build -mod=vendor -o terraform-provider-netbox .
 
 build-all: clean
-	@for GOOS in darwin linux windows; do for GOARCH in 386 amd64; do echo "==> Building terraform-provider-netbox ($${GOOS} / $${GOARCH})" && env GOOS=$${GOOS} GOARCH=$${GOARCH} env VERSION=${VERSION} go build -mod=vendor -o terraform-provider-netbox_v${VERSION} . && zip -q terraform-provider-netbox_v${VERSION}_$${GOOS}_$${GOARCH}.zip terraform-provider-netbox_v${VERSION} && rm terraform-provider-netbox_v${VERSION}; done; done
+	@for GOOS in darwin linux windows; do for GOARCH in 386 amd64; do echo "==> Building terraform-provider-netbox ($${GOOS} / $${GOARCH})" && env GOOS=$${GOOS} GOARCH=$${GOARCH} env VERSION=${VERSION} go build -mod=vendor -o terraform-provider-netbox_v${VERSION} . && zip -q terraform-provider-netbox_${VERSION}_$${GOOS}_$${GOARCH}.zip terraform-provider-netbox_v${VERSION} && rm terraform-provider-netbox_v${VERSION}; done; done
 	@for file in *.zip; do echo "$$(sha256sum $${file})" >>  terraform-provider-netbox_${VERSION}_SHA256SUMS; done
+	@gpg --detach-sign terraform-provider-netbox_${VERSION}_SHA256SUMS
 
 localinstall:
 	@echo "==> Creating folder ~/.terraform.d/plugins/registry.terraform.io/smutel/netbox/0.0.1/linux_amd64"
