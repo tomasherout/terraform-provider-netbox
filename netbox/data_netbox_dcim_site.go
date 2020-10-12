@@ -6,9 +6,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	netboxclient "github.com/netbox-community/go-netbox/netbox/client"
-	"github.com/netbox-community/go-netbox/netbox/client/dcim"
 	pkgerrors "github.com/pkg/errors"
+	netboxclient "github.com/tomasherout/go-netbox/netbox/client"
+	"github.com/tomasherout/go-netbox/netbox/client/dcim"
 )
 
 func dataNetboxDcimSite() *schema.Resource {
@@ -28,7 +28,7 @@ func dataNetboxDcimSite() *schema.Resource {
 }
 
 func dataNetboxDcimSiteRead(d *schema.ResourceData, m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	slug := d.Get("slug").(string)
 

@@ -48,3 +48,5 @@ override.tf.json
 # Exclude the provider
 terraform-provider-netbox*
 sha256sums.txt
+
+vendor

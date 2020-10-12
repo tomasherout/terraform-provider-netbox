@@ -1,6 +1,7 @@
 package netbox
 
 import (
+	"errors"
 	"regexp"
 	"strconv"
 
@@ -12,21 +13,17 @@ import (
 	"github.com/tomasherout/go-netbox/netbox/models"
 )
 
-func resourceNetboxIpamIPAddresses() *schema.Resource {
+func resourceNetboxIpamIPByPrefix() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceNetboxIpamIPAddressesCreate,
-		Read:   resourceNetboxIpamIPAddressesRead,
-		Update: resourceNetboxIpamIPAddressesUpdate,
-		Delete: resourceNetboxIpamIPAddressesDelete,
-		Exists: resourceNetboxIpamIPAddressesExists,
+		Create: resourceNetboxIpamIPByPrefixCreate,
+		Read:   resourceNetboxIpamIPByPrefixRead,
+		Update: resourceNetboxIpamIPByPrefixUpdate,
+		Delete: resourceNetboxIpamIPByPrefixsDelete,
 
 		Schema: map[string]*schema.Schema{
 			"address": {
 				Type:     schema.TypeString,
-				Required: true,
-				ValidateFunc: validation.StringMatch(
-					regexp.MustCompile("^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/"+
-						"[0-9]{1,2}$"), "Must be like 192.168.56.1/24"),
+				Computed: true,
 			},
 			"description": {
 				Type:         schema.TypeString,
@@ -87,68 +84,92 @@ func resourceNetboxIpamIPAddresses() *schema.Resource {
 	}
 }
 
-func resourceNetboxIpamIPAddressesCreate(d *schema.ResourceData,
+func resourceNetboxIpamIPByPrefixCreate(d *schema.ResourceData,
 	m interface{}) error {
+
 	client := m.(*netboxclient.NetBoxAPI)
 
-	address := d.Get("address").(string)
-	description := d.Get("description").(string)
-	dnsName := d.Get("dns_name").(string)
-	interfaceID := int64(d.Get("interface_id").(int))
-	natInsideID := int64(d.Get("nat_inside_id").(int))
-	natOutsideID := int64(d.Get("nat_outside_id").(int))
-	role := d.Get("role").(string)
-	status := d.Get("status").(string)
-	tags := d.Get("tags").(*schema.Set).List()
-	tenantID := int64(d.Get("tenant_id").(int))
-	vrfID := int64(d.Get("vrf_id").(int))
+	/*
+		newResource := &models.WritablePrefix{
 
-	newResource := &models.WritableIPAddress{
-		Address:     &address,
-		Description: description,
-		DNSName:     dnsName,
-		Role:        role,
-		Status:      status,
-		Tags:        expandToStringSlice(tags),
-	}
+		}
+	*/
 
-	if interfaceID != 0 {
-		dcimInterface := "dcim.interface"
-		newResource.AssignedObjectType = &dcimInterface
-		newResource.AssignedObjectID = &interfaceID
-	}
+	// FIXME: získat ID dotazem podle tagů
+	resource := ipam.NewIpamPrefixesAvailableIpsCreateParams().WithID(1)
 
-	if natInsideID != 0 {
-		newResource.NatInside = &natInsideID
-	}
+	// chce: IpamPrefixesAvailableIpsCreateParams
+	resourceCreated, err := client.Ipam.IpamPrefixesAvailableIpsCreate(resource, nil)
 
-	if natOutsideID != 0 {
-		newResource.NatOutside = &natOutsideID
-	}
-
-	if tenantID != 0 {
-		newResource.Tenant = &tenantID
-	}
-
-	if vrfID != 0 {
-		newResource.Vrf = &vrfID
-	}
-
-	resource := ipam.NewIpamIPAddressesCreateParams().WithData(newResource)
-
-	resourceCreated, err := client.Ipam.IpamIPAddressesCreate(resource, nil)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(strconv.FormatInt(resourceCreated.Payload.ID, 10))
+	return errors.New(resourceCreated.Payload.Address)
 
-	return resourceNetboxIpamIPAddressesRead(d, m)
+	return errors.New("create neimplementováno")
+
+	/*
+		address := d.Get("address").(string)
+		description := d.Get("description").(string)
+		dnsName := d.Get("dns_name").(string)
+		interfaceID := int64(d.Get("interface_id").(int))
+		natInsideID := int64(d.Get("nat_inside_id").(int))
+		natOutsideID := int64(d.Get("nat_outside_id").(int))
+		role := d.Get("role").(string)
+		status := d.Get("status").(string)
+		tags := d.Get("tags").(*schema.Set).List()
+		tenantID := int64(d.Get("tenant_id").(int))
+		vrfID := int64(d.Get("vrf_id").(int))
+
+		newResource := &models.WritableIPAddress{
+			Address:     &address,
+			Description: description,
+			DNSName:     dnsName,
+			Role:        role,
+			Status:      status,
+			Tags:        expandToStringSlice(tags),
+		}
+
+		if interfaceID != 0 {
+			newResource.Interface = &interfaceID
+		}
+
+		if natInsideID != 0 {
+			newResource.NatInside = &natInsideID
+		}
+
+		if natOutsideID != 0 {
+			newResource.NatOutside = &natOutsideID
+		}
+
+		if tenantID != 0 {
+			newResource.Tenant = &tenantID
+		}
+
+		if vrfID != 0 {
+			newResource.Vrf = &vrfID
+		}
+
+		resource := ipam.NewIpamIPAddressesCreateParams().WithData(newResource)
+
+		resourceCreated, err := client.Ipam.IpamIPAddressesCreate(resource, nil)
+		if err != nil {
+			return err
+		}
+
+		d.SetId(strconv.FormatInt(resourceCreated.Payload.ID, 10))
+
+		return resourceNetboxIpamIPAddressesRead(d, m)
+
+	*/
 }
 
-func resourceNetboxIpamIPAddressesRead(d *schema.ResourceData,
+func resourceNetboxIpamIPByPrefixRead(d *schema.ResourceData,
 	m interface{}) error {
 	client := m.(*netboxclient.NetBoxAPI)
+
+	return errors.New("read neimplementováno")
 
 	resourceID := d.Id()
 	params := ipam.NewIpamIPAddressesListParams().WithID(&resourceID)
@@ -171,7 +192,7 @@ func resourceNetboxIpamIPAddressesRead(d *schema.ResourceData,
 				return err
 			}
 
-			if resource.AssignedObjectID == nil {
+			if resource.AssignedObjectID != nil {
 				if *resource.AssignedObjectType == "dcim.interface" {
 					if err = d.Set("interface_id", resource.AssignedObjectID); err != nil {
 						return err
@@ -252,8 +273,11 @@ func resourceNetboxIpamIPAddressesRead(d *schema.ResourceData,
 	return nil
 }
 
-func resourceNetboxIpamIPAddressesUpdate(d *schema.ResourceData,
+func resourceNetboxIpamIPByPrefixUpdate(d *schema.ResourceData,
 	m interface{}) error {
+
+	return errors.New("update neimplementováno")
+
 	client := m.(*netboxclient.NetBoxAPI)
 	params := &models.WritableIPAddress{}
 
@@ -340,8 +364,11 @@ func resourceNetboxIpamIPAddressesUpdate(d *schema.ResourceData,
 	return resourceNetboxIpamIPAddressesRead(d, m)
 }
 
-func resourceNetboxIpamIPAddressesDelete(d *schema.ResourceData,
+func resourceNetboxIpamIPByPrefixsDelete(d *schema.ResourceData,
 	m interface{}) error {
+
+	return errors.New("delete neimplementováno")
+
 	client := m.(*netboxclient.NetBoxAPI)
 
 	resourceExists, err := resourceNetboxIpamIPAddressesExists(d, m)
@@ -364,25 +391,4 @@ func resourceNetboxIpamIPAddressesDelete(d *schema.ResourceData,
 	}
 
 	return nil
-}
-
-func resourceNetboxIpamIPAddressesExists(d *schema.ResourceData,
-	m interface{}) (b bool, e error) {
-	client := m.(*netboxclient.NetBoxAPI)
-	resourceExist := false
-
-	resourceID := d.Id()
-	params := ipam.NewIpamIPAddressesListParams().WithID(&resourceID)
-	resources, err := client.Ipam.IpamIPAddressesList(params, nil)
-	if err != nil {
-		return resourceExist, err
-	}
-
-	for _, resource := range resources.Payload.Results {
-		if strconv.FormatInt(resource.ID, 10) == d.Id() {
-			resourceExist = true
-		}
-	}
-
-	return resourceExist, nil
 }

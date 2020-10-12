@@ -1,11 +1,12 @@
-module github.com/smutel/terraform-provider-netbox
+module github.com/tomasherout/terraform-provider-netbox
 
 go 1.14
 
 require (
-	github.com/go-openapi/runtime v0.19.15
+	github.com/go-openapi/runtime v0.19.21
 	github.com/go-openapi/strfmt v0.19.5
 	github.com/hashicorp/terraform-plugin-sdk v1.13.0
-	github.com/netbox-community/go-netbox v0.0.0-20200527232624-eea85738db88
 	github.com/pkg/errors v0.9.1
+	github.com/tomasherout/go-netbox v0.0.0-20201012153629-8bf701f9a48b
+	github.com/vektah/gqlparser v1.1.2 // indirect
 )

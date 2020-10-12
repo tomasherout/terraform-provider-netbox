@@ -6,7 +6,7 @@ import (
 	runtimeclient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/netbox-community/go-netbox/netbox/client"
+	"github.com/tomasherout/go-netbox/netbox/client"
 )
 
 const authHeaderName = "Authorization"
@@ -43,6 +43,7 @@ func Provider() *schema.Provider {
 			"netbox_ipam_vlan_group":      dataNetboxIpamVlanGroup(),
 			"netbox_tenancy_tenant":       dataNetboxTenancyTenant(),
 			"netbox_tenancy_tenant_group": dataNetboxTenancyTenantGroup(),
+			"netbox_ipam_prefixes":        dataNetboxIpamIPPrefixes(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"netbox_ipam_prefix":          resourceNetboxIpamPrefix(),
@@ -51,6 +52,7 @@ func Provider() *schema.Provider {
 			"netbox_ipam_vlan_group":      resourceNetboxIpamVlanGroup(),
 			"netbox_tenancy_tenant":       resourceNetboxTenancyTenant(),
 			"netbox_tenancy_tenant_group": resourceNetboxTenancyTenantGroup(),
+			"netbox_ipam_ip_by_prefix":    resourceNetboxIpamIPByPrefix(),
 		},
 		ConfigureFunc: configureProvider,
 	}

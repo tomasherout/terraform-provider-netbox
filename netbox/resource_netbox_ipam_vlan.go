@@ -5,10 +5,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	netboxclient "github.com/netbox-community/go-netbox/netbox/client"
-	"github.com/netbox-community/go-netbox/netbox/client/ipam"
-	"github.com/netbox-community/go-netbox/netbox/models"
 	pkgerrors "github.com/pkg/errors"
+	netboxclient "github.com/tomasherout/go-netbox/netbox/client"
+	"github.com/tomasherout/go-netbox/netbox/client/ipam"
+	"github.com/tomasherout/go-netbox/netbox/models"
 )
 
 func resourceNetboxIpamVlan() *schema.Resource {
@@ -70,7 +70,7 @@ func resourceNetboxIpamVlan() *schema.Resource {
 
 func resourceNetboxIpamVlanCreate(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	description := d.Get("description").(string)
 	groupID := int64(d.Get("vlan_group_id").(int))
@@ -119,7 +119,7 @@ func resourceNetboxIpamVlanCreate(d *schema.ResourceData,
 
 func resourceNetboxIpamVlanRead(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	resourceID := d.Id()
 	params := ipam.NewIpamVlansListParams().WithID(&resourceID)
@@ -206,7 +206,7 @@ func resourceNetboxIpamVlanRead(d *schema.ResourceData,
 
 func resourceNetboxIpamVlanUpdate(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 	params := &models.WritableVLAN{}
 
 	if d.HasChange("description") {
@@ -278,7 +278,7 @@ func resourceNetboxIpamVlanUpdate(d *schema.ResourceData,
 }
 
 func resourceNetboxIpamVlanDelete(d *schema.ResourceData, m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	resourceExists, err := resourceNetboxIpamVlanExists(d, m)
 	if err != nil {
@@ -304,7 +304,7 @@ func resourceNetboxIpamVlanDelete(d *schema.ResourceData, m interface{}) error {
 
 func resourceNetboxIpamVlanExists(d *schema.ResourceData, m interface{}) (b bool,
 	e error) {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 	resourceExist := false
 
 	vlanID := d.Id()

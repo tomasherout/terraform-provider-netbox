@@ -6,9 +6,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	netboxclient "github.com/netbox-community/go-netbox/netbox/client"
-	"github.com/netbox-community/go-netbox/netbox/client/tenancy"
 	pkgerrors "github.com/pkg/errors"
+	netboxclient "github.com/tomasherout/go-netbox/netbox/client"
+	"github.com/tomasherout/go-netbox/netbox/client/tenancy"
 )
 
 func dataNetboxTenancyTenantGroup() *schema.Resource {
@@ -30,7 +30,7 @@ func dataNetboxTenancyTenantGroup() *schema.Resource {
 func dataNetboxTenancyTenantGroupRead(d *schema.ResourceData,
 	m interface{}) error {
 
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	slug := d.Get("slug").(string)
 

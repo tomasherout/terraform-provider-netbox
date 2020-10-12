@@ -6,9 +6,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	netboxclient "github.com/netbox-community/go-netbox/netbox/client"
-	"github.com/netbox-community/go-netbox/netbox/client/ipam"
 	pkgerrors "github.com/pkg/errors"
+	netboxclient "github.com/tomasherout/go-netbox/netbox/client"
+	"github.com/tomasherout/go-netbox/netbox/client/ipam"
 )
 
 func dataNetboxIpamIPAddresses() *schema.Resource {
@@ -29,7 +29,7 @@ func dataNetboxIpamIPAddresses() *schema.Resource {
 
 func dataNetboxIpamIPAddressesRead(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	address := d.Get("address").(string)
 

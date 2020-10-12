@@ -6,10 +6,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	netboxclient "github.com/netbox-community/go-netbox/netbox/client"
-	"github.com/netbox-community/go-netbox/netbox/client/tenancy"
-	"github.com/netbox-community/go-netbox/netbox/models"
 	pkgerrors "github.com/pkg/errors"
+	netboxclient "github.com/tomasherout/go-netbox/netbox/client"
+	"github.com/tomasherout/go-netbox/netbox/client/tenancy"
+	"github.com/tomasherout/go-netbox/netbox/models"
 )
 
 func resourceNetboxTenancyTenant() *schema.Resource {
@@ -61,7 +61,7 @@ func resourceNetboxTenancyTenant() *schema.Resource {
 
 func resourceNetboxTenancyTenantCreate(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	comments := d.Get("comments").(string)
 	description := d.Get("description").(string)
@@ -96,7 +96,7 @@ func resourceNetboxTenancyTenantCreate(d *schema.ResourceData,
 
 func resourceNetboxTenancyTenantRead(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	resourceID := d.Id()
 	params := tenancy.NewTenancyTenantsListParams().WithID(&resourceID)
@@ -147,7 +147,7 @@ func resourceNetboxTenancyTenantRead(d *schema.ResourceData,
 
 func resourceNetboxTenancyTenantUpdate(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 	params := &models.WritableTenant{}
 
 	if d.HasChange("comments") {
@@ -193,7 +193,7 @@ func resourceNetboxTenancyTenantUpdate(d *schema.ResourceData,
 
 func resourceNetboxTenancyTenantDelete(d *schema.ResourceData,
 	m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	resourceExists, err := resourceNetboxTenancyTenantExists(d, m)
 	if err != nil {
@@ -220,7 +220,7 @@ func resourceNetboxTenancyTenantDelete(d *schema.ResourceData,
 func resourceNetboxTenancyTenantExists(d *schema.ResourceData,
 	m interface{}) (b bool,
 	e error) {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 	resourceExist := false
 
 	resourceID := d.Id()

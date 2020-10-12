@@ -1,14 +1,18 @@
 package netbox
 
-func expandToStringSlice(v []interface{}) []string {
-	s := make([]string, len(v))
+import "github.com/tomasherout/go-netbox/netbox/models"
+
+func expandToStringSlice(v []interface{}) []*models.NestedTag {
+	nestedTags := make([]*models.NestedTag, len(v))
 	for i, val := range v {
 		if strVal, ok := val.(string); ok {
-			s[i] = strVal
+			nestedTags[i] = &models.NestedTag{
+				Slug: &strVal,
+			}
 		}
 	}
 
-	return s
+	return nestedTags
 }
 
 /*

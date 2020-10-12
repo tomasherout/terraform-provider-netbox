@@ -4,9 +4,9 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	netboxclient "github.com/netbox-community/go-netbox/netbox/client"
-	"github.com/netbox-community/go-netbox/netbox/client/ipam"
 	pkgerrors "github.com/pkg/errors"
+	netboxclient "github.com/tomasherout/go-netbox/netbox/client"
+	"github.com/tomasherout/go-netbox/netbox/client/ipam"
 )
 
 func dataNetboxIpamVlan() *schema.Resource {
@@ -27,7 +27,7 @@ func dataNetboxIpamVlan() *schema.Resource {
 }
 
 func dataNetboxIpamVlanRead(d *schema.ResourceData, m interface{}) error {
-	client := m.(*netboxclient.NetBox)
+	client := m.(*netboxclient.NetBoxAPI)
 
 	id := int64(d.Get("vlan_id").(int))
 	idStr := strconv.FormatInt(id, 10)
