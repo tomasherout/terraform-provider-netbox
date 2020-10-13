@@ -80,6 +80,13 @@ func resourceNetboxIpamIPByPrefix() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
+			"search_prefix_ids": {
+				Type:     schema.TypeSet,
+				Required: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeInt,
+				},
+			},
 		},
 	}
 }
@@ -89,25 +96,37 @@ func resourceNetboxIpamIPByPrefixCreate(d *schema.ResourceData,
 
 	client := m.(*netboxclient.NetBoxAPI)
 
-	/*
-		newResource := &models.WritablePrefix{
+	prefixIds := d.Get("search_prefix_ids").(*schema.Set)
 
-		}
-	*/
-
-	// FIXME: získat ID dotazem podle tagů
-	resource := ipam.NewIpamPrefixesAvailableIpsCreateParams().WithID(1)
-
-	// chce: IpamPrefixesAvailableIpsCreateParams
-	resourceCreated, err := client.Ipam.IpamPrefixesAvailableIpsCreate(resource, nil)
-
-	if err != nil {
-		return err
+	if prefixIds.Len() == 0 {
+		return errors.New("search_prefix_ids nemůže být předáno prázdné")
 	}
 
-	return errors.New(resourceCreated.Payload.Address)
+	// projít jednotlivé prefixy a zkusit v nich získat volnou IP adresu
+	for _, prefixId := range prefixIds.List() {
+		resource := ipam.NewIpamPrefixesAvailableIpsCreateParams().WithID(int64(prefixId.(int)))
 
-	return errors.New("create neimplementováno")
+		// chce: IpamPrefixesAvailableIpsCreateParams
+		resourceCreated, err := client.Ipam.IpamPrefixesAvailableIpsCreate(resource, nil)
+
+		if err != nil {
+			// status 204 se vrací v případě, že je subnet plný
+			if m, _ := regexp.MatchString("status 204", err.Error()); m {
+				continue
+			} else {
+				return err
+			}
+		}
+
+		// uložíme si ID
+		// resourceCreated.Payload.ID
+		d.SetId(strconv.FormatInt(resourceCreated.Payload.ID, 10))
+
+		// a přečteme IP adresu pro získání zbylých údajů a máme hotovo
+		return resourceNetboxIpamIPByPrefixRead(d, m)
+	}
+
+	return errors.New("žádný ze subnetů nemá volnou IP adresu")
 
 	/*
 		address := d.Get("address").(string)
@@ -169,106 +188,108 @@ func resourceNetboxIpamIPByPrefixRead(d *schema.ResourceData,
 	m interface{}) error {
 	client := m.(*netboxclient.NetBoxAPI)
 
-	return errors.New("read neimplementováno")
-
 	resourceID := d.Id()
-	params := ipam.NewIpamIPAddressesListParams().WithID(&resourceID)
-	resources, err := client.Ipam.IpamIPAddressesList(params, nil)
+	resourceIDInt64, err := strconv.ParseInt(resourceID, 10, 64)
+
 	if err != nil {
 		return err
 	}
 
-	for _, resource := range resources.Payload.Results {
-		if strconv.FormatInt(resource.ID, 10) == d.Id() {
-			if err = d.Set("address", resource.Address); err != nil {
+	params := ipam.NewIpamIPAddressesReadParams().WithID(resourceIDInt64)
+	resource, err := client.Ipam.IpamIPAddressesRead(params, nil)
+
+	if err != nil {
+		return err
+	}
+
+	// TODO: vyzkoušet, když zdroj neexistuje a provést:
+	// d.SetId("")
+
+	payload := resource.Payload
+
+	if err = d.Set("address", payload.Address); err != nil {
+		return err
+	}
+
+	if err = d.Set("description", payload.Description); err != nil {
+		return err
+	}
+
+	if err = d.Set("dns_name", payload.DNSName); err != nil {
+		return err
+	}
+
+	if payload.AssignedObjectID != nil {
+		if *payload.AssignedObjectType == "dcim.interface" {
+			if err = d.Set("interface_id", payload.AssignedObjectID); err != nil {
 				return err
 			}
-
-			if err = d.Set("description", resource.Description); err != nil {
-				return err
-			}
-
-			if err = d.Set("dns_name", resource.DNSName); err != nil {
-				return err
-			}
-
-			if resource.AssignedObjectID != nil {
-				if *resource.AssignedObjectType == "dcim.interface" {
-					if err = d.Set("interface_id", resource.AssignedObjectID); err != nil {
-						return err
-					}
-				}
-			}
-
-			if resource.NatInside == nil {
-				if err = d.Set("nat_inside_id", nil); err != nil {
-					return err
-				}
-			} else {
-				if err = d.Set("nat_inside_id", resource.NatInside.ID); err != nil {
-					return err
-				}
-			}
-
-			if resource.NatOutside == nil {
-				if err = d.Set("nat_outside_id", nil); err != nil {
-					return err
-				}
-			} else {
-				if err = d.Set("nat_outside_id", resource.NatOutside.ID); err != nil {
-					return err
-				}
-			}
-
-			if resource.Role == nil {
-				if err = d.Set("role", nil); err != nil {
-					return err
-				}
-			} else {
-				if err = d.Set("role", resource.Role.Value); err != nil {
-					return err
-				}
-			}
-
-			if resource.Status == nil {
-				if err = d.Set("status", nil); err != nil {
-					return err
-				}
-			} else {
-				if err = d.Set("status", resource.Status.Value); err != nil {
-					return err
-				}
-			}
-
-			if err = d.Set("tags", resource.Tags); err != nil {
-				return err
-			}
-
-			if resource.Tenant == nil {
-				if err = d.Set("tenant_id", nil); err != nil {
-					return err
-				}
-			} else {
-				if err = d.Set("tenant_id", resource.Tenant.ID); err != nil {
-					return err
-				}
-			}
-
-			if resource.Vrf == nil {
-				if err = d.Set("vrf_id", nil); err != nil {
-					return err
-				}
-			} else {
-				if err = d.Set("vrf_id", resource.Vrf.ID); err != nil {
-					return err
-				}
-			}
-
-			return nil
 		}
 	}
 
-	d.SetId("")
+	if payload.NatInside == nil {
+		if err = d.Set("nat_inside_id", nil); err != nil {
+			return err
+		}
+	} else {
+		if err = d.Set("nat_inside_id", payload.NatInside.ID); err != nil {
+			return err
+		}
+	}
+
+	if payload.NatOutside == nil {
+		if err = d.Set("nat_outside_id", nil); err != nil {
+			return err
+		}
+	} else {
+		if err = d.Set("nat_outside_id", payload.NatOutside.ID); err != nil {
+			return err
+		}
+	}
+
+	if payload.Role == nil {
+		if err = d.Set("role", nil); err != nil {
+			return err
+		}
+	} else {
+		if err = d.Set("role", payload.Role.Value); err != nil {
+			return err
+		}
+	}
+
+	if payload.Status == nil {
+		if err = d.Set("status", nil); err != nil {
+			return err
+		}
+	} else {
+		if err = d.Set("status", payload.Status.Value); err != nil {
+			return err
+		}
+	}
+
+	if err = d.Set("tags", payload.Tags); err != nil {
+		return err
+	}
+
+	if payload.Tenant == nil {
+		if err = d.Set("tenant_id", nil); err != nil {
+			return err
+		}
+	} else {
+		if err = d.Set("tenant_id", payload.Tenant.ID); err != nil {
+			return err
+		}
+	}
+
+	if payload.Vrf == nil {
+		if err = d.Set("vrf_id", nil); err != nil {
+			return err
+		}
+	} else {
+		if err = d.Set("vrf_id", payload.Vrf.ID); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
