@@ -142,12 +142,17 @@ func resourceNetboxIpamIPByPrefixRead(d *schema.ResourceData, m interface{}) err
 	params := ipam.NewIpamIPAddressesReadParams().WithID(ipIDInt64)
 	resource, err := client.Ipam.IpamIPAddressesRead(params, nil)
 
+	// pokud se vrátí chyba
 	if err != nil {
-		return err
+		if m, _ := regexp.MatchString("status 404", err.Error()); m {
+			// chyba je 404
+			// IP adresa neexistuje
+			d.SetId("")
+			return nil
+		} else {
+			return err
+		}
 	}
-
-	// TODO: vyzkoušet, když zdroj neexistuje a provést:
-	// d.SetId("")
 
 	payload := resource.Payload
 

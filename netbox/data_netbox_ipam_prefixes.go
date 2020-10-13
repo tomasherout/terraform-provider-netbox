@@ -15,7 +15,7 @@ func dataNetboxIpamIPPrefixes() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"tags": {
 				Type:     schema.TypeSet,
-				Required: true,
+				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -35,14 +35,18 @@ func dataNetboxIpamIPPrefixesRead(d *schema.ResourceData, m interface{}) error {
 
 	client := m.(*netboxclient.NetBoxAPI)
 
-	tags := d.Get("tags").(*schema.Set)
-	tagsStr := make([]string, tags.Len())
+	params := ipam.NewIpamPrefixesListParams()
 
-	for i, elem := range tags.List() {
-		tagsStr[i] = elem.(string)
+	// pokud jsou zadané tagy
+	if tags := d.Get("tags").(*schema.Set); len(tags.List()) > 0 {
+		// převést na pole stringů
+		tagsStr := make([]string, tags.Len())
+		for i, elem := range tags.List() {
+			tagsStr[i] = elem.(string)
+		}
+		// přidat do parametrů (filtr)
+		params.SetTag(tagsStr)
 	}
-
-	params := ipam.NewIpamPrefixesListParams().WithTag(tagsStr)
 
 	res, err := client.Ipam.IpamPrefixesList(params, nil)
 
