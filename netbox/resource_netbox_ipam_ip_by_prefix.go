@@ -83,6 +83,7 @@ func resourceNetboxIpamIPByPrefix() *schema.Resource {
 			"search_prefix_ids": {
 				Type:     schema.TypeSet,
 				Required: true,
+				ForceNew: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
 				},
@@ -91,8 +92,7 @@ func resourceNetboxIpamIPByPrefix() *schema.Resource {
 	}
 }
 
-func resourceNetboxIpamIPByPrefixCreate(d *schema.ResourceData,
-	m interface{}) error {
+func resourceNetboxIpamIPByPrefixCreate(d *schema.ResourceData, m interface{}) error {
 
 	client := m.(*netboxclient.NetBoxAPI)
 
@@ -127,75 +127,19 @@ func resourceNetboxIpamIPByPrefixCreate(d *schema.ResourceData,
 	}
 
 	return errors.New("žádný ze subnetů nemá volnou IP adresu")
-
-	/*
-		address := d.Get("address").(string)
-		description := d.Get("description").(string)
-		dnsName := d.Get("dns_name").(string)
-		interfaceID := int64(d.Get("interface_id").(int))
-		natInsideID := int64(d.Get("nat_inside_id").(int))
-		natOutsideID := int64(d.Get("nat_outside_id").(int))
-		role := d.Get("role").(string)
-		status := d.Get("status").(string)
-		tags := d.Get("tags").(*schema.Set).List()
-		tenantID := int64(d.Get("tenant_id").(int))
-		vrfID := int64(d.Get("vrf_id").(int))
-
-		newResource := &models.WritableIPAddress{
-			Address:     &address,
-			Description: description,
-			DNSName:     dnsName,
-			Role:        role,
-			Status:      status,
-			Tags:        expandToStringSlice(tags),
-		}
-
-		if interfaceID != 0 {
-			newResource.Interface = &interfaceID
-		}
-
-		if natInsideID != 0 {
-			newResource.NatInside = &natInsideID
-		}
-
-		if natOutsideID != 0 {
-			newResource.NatOutside = &natOutsideID
-		}
-
-		if tenantID != 0 {
-			newResource.Tenant = &tenantID
-		}
-
-		if vrfID != 0 {
-			newResource.Vrf = &vrfID
-		}
-
-		resource := ipam.NewIpamIPAddressesCreateParams().WithData(newResource)
-
-		resourceCreated, err := client.Ipam.IpamIPAddressesCreate(resource, nil)
-		if err != nil {
-			return err
-		}
-
-		d.SetId(strconv.FormatInt(resourceCreated.Payload.ID, 10))
-
-		return resourceNetboxIpamIPAddressesRead(d, m)
-
-	*/
 }
 
-func resourceNetboxIpamIPByPrefixRead(d *schema.ResourceData,
-	m interface{}) error {
+func resourceNetboxIpamIPByPrefixRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*netboxclient.NetBoxAPI)
 
-	resourceID := d.Id()
-	resourceIDInt64, err := strconv.ParseInt(resourceID, 10, 64)
+	ipID := d.Id()
+	ipIDInt64, err := strconv.ParseInt(ipID, 10, 64)
 
 	if err != nil {
 		return err
 	}
 
-	params := ipam.NewIpamIPAddressesReadParams().WithID(resourceIDInt64)
+	params := ipam.NewIpamIPAddressesReadParams().WithID(ipIDInt64)
 	resource, err := client.Ipam.IpamIPAddressesRead(params, nil)
 
 	if err != nil {
@@ -294,10 +238,7 @@ func resourceNetboxIpamIPByPrefixRead(d *schema.ResourceData,
 	return nil
 }
 
-func resourceNetboxIpamIPByPrefixUpdate(d *schema.ResourceData,
-	m interface{}) error {
-
-	return errors.New("update neimplementováno")
+func resourceNetboxIpamIPByPrefixUpdate(d *schema.ResourceData, m interface{}) error {
 
 	client := m.(*netboxclient.NetBoxAPI)
 	params := &models.WritableIPAddress{}
@@ -385,31 +326,24 @@ func resourceNetboxIpamIPByPrefixUpdate(d *schema.ResourceData,
 	return resourceNetboxIpamIPAddressesRead(d, m)
 }
 
-func resourceNetboxIpamIPByPrefixsDelete(d *schema.ResourceData,
-	m interface{}) error {
-
-	return errors.New("delete neimplementováno")
+func resourceNetboxIpamIPByPrefixsDelete(d *schema.ResourceData, m interface{}) error {
 
 	client := m.(*netboxclient.NetBoxAPI)
 
-	resourceExists, err := resourceNetboxIpamIPAddressesExists(d, m)
+	ipID := d.Id()
+	ipIDInt64, err := strconv.ParseInt(ipID, 10, 64)
+
 	if err != nil {
 		return err
 	}
 
-	if !resourceExists {
-		return nil
-	}
+	resource := ipam.NewIpamIPAddressesDeleteParams().WithID(ipIDInt64)
 
-	id, err := strconv.ParseInt(d.Id(), 10, 64)
-	if err != nil {
-		return pkgerrors.New("Unable to convert ID into int64")
-	}
-
-	resource := ipam.NewIpamIPAddressesDeleteParams().WithID(id)
 	if _, err := client.Ipam.IpamIPAddressesDelete(resource, nil); err != nil {
 		return err
 	}
+
+	d.SetId("")
 
 	return nil
 }
