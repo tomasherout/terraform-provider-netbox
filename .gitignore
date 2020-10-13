@@ -50,3 +50,4 @@ terraform-provider-netbox*
 sha256sums.txt
 
 vendor
+.idea
